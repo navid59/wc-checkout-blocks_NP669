@@ -5,9 +5,12 @@ Plugin Name: NETOPIA Payments Payment Gateway
 Plugin URI: https://www.netopia-payments.ro
 Description: accept payments through NETOPIA Payments
 Author: Netopia
-Version: 1.3
+Version: 1.4
 License: GPLv2
 */
+
+// The ID use as unigue identifier in Block
+// define('NETOPIA_PAYMENTS_ID', 'netopia_payments');
 
 // Include our Gateway Class and register Payment Gateway with WooCommerce
 add_action( 'plugins_loaded', 'netopiapayments_init', 0 );
@@ -47,6 +50,47 @@ function netopiapayments_init() {
         wp_enqueue_script( 'netopiatoastrjs', plugin_dir_url( __FILE__ ) . 'js/toastr.min.js',array(),'2.0' ,true);
         wp_enqueue_style( 'netopiatoastrcss', plugin_dir_url( __FILE__ ) . 'css/toastr.min.css',array(),'2.0' ,false);
     }
+
+	/**
+	 * Custom function to declare compatibility with cart_checkout_blocks feature 
+	*/
+	function declare_netopiapayments_blocks_compatibility() {
+		// Check if the required class exists
+		if (class_exists('\Automattic\WooCommerce\Utilities\FeaturesUtil')) {
+			// Declare compatibility for 'cart_checkout_blocks'
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+		}
+	}
+	// Hook the custom function to the 'before_woocommerce_init' action
+	add_action('before_woocommerce_init', 'declare_netopiapayments_blocks_compatibility');
+
+	// Hook in Blocks integration. This action is called in a callback on plugins loaded
+	add_action( 'woocommerce_blocks_loaded', 'woocommerce_gateway_netopia_block_support' );
+	function woocommerce_gateway_netopia_block_support() {
+		if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+			
+			// Include the custom Block checkout class
+			require_once dirname( __FILE__ ) . '/netopia/Payment/Blocks.php';
+
+			// Hook the registration function to the 'woocommerce_blocks_payment_method_type_registration' action
+			add_action(
+				'woocommerce_blocks_payment_method_type_registration',
+				function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+					add_action(
+						'woocommerce_blocks_payment_method_type_registration',
+						function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+							// Registre an instance of netopiaBlocks
+							$payment_method_registry->register( new netopiapaymentsBlocks );
+						 }
+					);
+				},
+				5
+			);
+		} else {
+			// The Current installation of wordpress not sue WooCommerce Block
+			return;
+		}
+	}
 }
 
 

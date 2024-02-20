@@ -13,12 +13,17 @@ class netopiapayments extends WC_Payment_Gateway {
 	public $sandbox_cer;
 	public $sandbox_key;
 
+	/**
+	 * Netopia Payment Method like SMS,.. is removed form v1.4
+	 * The $payment_methods, $sms_setting, $service_id
+	 * was related to this ,...
+	 */
 	// Dynamic payment Method
-	public $payment_methods;
+	// public $payment_methods;
 
 	// Dynamic SMS properties
-	public $sms_setting;
-	public $service_id;
+	// public $sms_setting;
+	// public $service_id;
 
 	// Setup our Gateway's id, description and other values
 	function __construct() {
@@ -137,32 +142,42 @@ class netopiapayments extends WC_Payment_Gateway {
                 'type'		=> 'file',
                 'desc_tip'	=> is_null($this->get_option('sandbox_key')) ? __( 'Download the Sandbox Certificat merchant account / Privated key™ from Netopia and upload here', 'netopiapayments' ) : $this->get_option('sandbox_key'),
             ),
-			'payment_methods'   => array(
-		        'title'       => __( 'Payment methods', 'netopiapayments' ),
-		        'type'        => 'multiselect',
-		        'description' => __( 'Select which payment methods to accept.', 'netopiapayments' ),
-		        'default'     => '',
-		        'options'     => array(
-		          'credit_card'	      => __( 'Credit Card', 'netopiapayments' ),
-		          'sms'			        => __('SMS' , 'netopiapayments' ),
-		          'bank_transfer'		      => __( 'Bank Transfer', 'netopiapayments' ),
-		          'bitcoin'  => __( 'Bitcoin', 'netopiapayments' )
-		          ),
-		    ),	
-			'sms_setting' => array(
-				'title'       => __( 'For SMS Payment', 'netopiapayments' ),
-				'type'        => 'title',
-				'description' => '',
-			),	
-			'service_id' => array(
-				'title'		=> __( 'Product/service code: ', 'netopiapayments' ),
-				'type'		=> 'text',
-				'desc_tip'	=> __( 'This is Service Code provided by Netopia when you signed up for an account.', 'netopiapayments' ),
-				'description' => __( 'Login to Netopia and go to Admin -> Conturi de comerciant -> Produse si servicii -> Semnul plus', 'netopiapayments' ),
-			),
+			/**
+			 * Netopia Payment Method like SMS,.. is removed form v1.4
+			 * The payment_methods, sms_setting, service_id
+			 * was related to this ,...
+			 */
+			// 'payment_methods'   => array(
+		    //     'title'       => __( 'Payment methods', 'netopiapayments' ),
+		    //     'type'        => 'multiselect',
+		    //     'description' => __( 'Select which payment methods to accept.', 'netopiapayments' ),
+		    //     'default'     => '',
+		    //     'options'     => array(
+		    //       'credit_card'	      => __( 'Credit Card', 'netopiapayments' ),
+		    //       'sms'			        => __('SMS' , 'netopiapayments' ),
+		    //       'bank_transfer'		      => __( 'Bank Transfer', 'netopiapayments' ),
+		    //       'bitcoin'  => __( 'Bitcoin', 'netopiapayments' )
+		    //       ),
+		    // ),	
+			// 'sms_setting' => array(
+			// 	'title'       => __( 'For SMS Payment', 'netopiapayments' ),
+			// 	'type'        => 'title',
+			// 	'description' => '',
+			// ),	
+			// 'service_id' => array(
+			// 	'title'		=> __( 'Product/service code: ', 'netopiapayments' ),
+			// 	'type'		=> 'text',
+			// 	'desc_tip'	=> __( 'This is Service Code provided by Netopia when you signed up for an account.', 'netopiapayments' ),
+			// 	'description' => __( 'Login to Netopia and go to Admin -> Conturi de comerciant -> Produse si servicii -> Semnul plus', 'netopiapayments' ),
+			// ),
 		);		
 	}
 
+	/**
+	 * Netopia Payment Method like SMS,.. is removed form v1.4
+	 * This part was related to this ,...
+	 */
+	/**
 	function payment_fields() {
 		// Description of payment method from settings
       	if ( $this->description ) { ?>
@@ -222,6 +237,7 @@ class netopiapayments extends WC_Payment_Gateway {
 		</script>
   		<?php
   	}
+	*/
 
   	// Submit payment
 	public function process_payment( $order_id ) {
@@ -251,15 +267,15 @@ class netopiapayments extends WC_Payment_Gateway {
     }
 
 	// Validate fields
-	public function validate_fields() {
-		$method_pay            = $this->get_post( 'netopia_method_pay' );
-		// Check card number
-		if ( empty( $method_pay ) ) {
-			wc_add_notice( __( 'Alege metoda de plata.', 'netopiapayments' ), $notice_type = 'error' );
-			return false;
-		}
-		return true;
-	}
+	// public function validate_fields() {
+	// 	$method_pay            = $this->get_post( 'netopia_method_pay' );
+	// 	// Check card number
+	// 	if ( empty( $method_pay ) ) {
+	// 		wc_add_notice( __( 'Alege metoda de plata.', 'netopiapayments' ), $notice_type = 'error' );
+	// 		return false;
+	// 	}
+	// 	return true;
+	// }
 
   	/**
 	* Receipt Page
@@ -335,7 +351,8 @@ class netopiapayments extends WC_Payment_Gateway {
 			$objPmReq->invoice = new Netopia_Payment_Invoice();
 			$objPmReq->invoice->currency	= $customer_order->get_currency();
 			$objPmReq->invoice->amount		= sprintf('%.2f',$customer_order->get_total());
-			$objPmReq->invoice->details		= 'Plata pentru comanda cu ID: '.$order_id.' with '.$name_methods[$method];
+			// $objPmReq->invoice->details		= 'Plata pentru comanda cu ID: '.$order_id.' with '.$name_methods[$method];
+			$objPmReq->invoice->details		= 'Plata pentru comanda cu ID: '.$order_id;
 
 			$billingAddress 				= new Netopia_Payment_Address();
 			$billingAddress->type			= 'person';//$_POST['billing_type'];
@@ -395,7 +412,6 @@ class netopiapayments extends WC_Payment_Gateway {
 				</script>
 			</form>';
 		} catch (\Exception $e) {
-			// throw $th;
 			echo '<p><i style="color:red">Asigura-te ca ai incarcat toate cele 4 chei de securitate, 2 pentru mediul live, 2 pentru mediul sandbox! Citeste cu atentie instructiunile din manual!</i></p>
 				 <p style="font-size:small">Ai in continuare probleme? Trimite-ne doua screenshot-uri la <a href="mailto:implementare@netopia.ro">implementare@netopia.ro</a>, unul cu setarile metodei de plata din adminul wordpress si unul cu locatia in care ai incarcat cheile (de preferat sa se vada denumirea completa a cheilor si calea completa a locatiei)</p>';
 		}
