@@ -103,3 +103,12 @@ register_activation_hook( __FILE__, 'plugin_activated' );
 function plugin_activated(){
 	add_option( 'woocommerce_netopiapayments_certifications', 'verify-and-regenerate' );
 }
+
+/**
+ * The verify and generate certifications will add before the plugin upgrade too.
+ * Just in case if installation failed,..
+ */
+add_action('upgrader_pre_install', 'ntpPreUpgrade', 10, 2);
+function ntpPreUpgrade($upgrader_object, $options) {
+    add_option( 'woocommerce_netopiapayments_certifications', 'verify-and-regenerate' );
+}
