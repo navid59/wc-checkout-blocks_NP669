@@ -110,5 +110,20 @@ function plugin_activated(){
  */
 add_action('upgrader_pre_install', 'ntpPreUpgrade', 10, 2);
 function ntpPreUpgrade($upgrader_object, $options) {
+	// Deactivate the plugin
+	deactivate_plugins(plugin_basename(__FILE__));
     add_option( 'woocommerce_netopiapayments_certifications', 'verify-and-regenerate' );
+}
+
+add_action('upgrader_process_complete', 'ntpUpgrade_complete', 10, 2);
+
+function ntpUpgrade_complete($upgrader_object, $options) {
+    add_option( 'woocommerce_netopiapayments_certifications', 'verify-and-regenerate' );
+}
+
+// Hook into the uninstall action
+register_uninstall_hook(__FILE__, 'ntpUninstall');
+function ntpUninstall() {
+    // Deactivate the plugin
+    deactivate_plugins(plugin_basename(__FILE__));
 }
